@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลานท่าวัง - ระบบลงทะเบียนคัมภีร์ใบลาน</title>
+    <meta name="description" content="ระบบลงทะเบียนและจัดการฐานข้อมูลคัมภีร์ใบลาน เมืองนครศรีธรรมราช">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <p class="loading-text">กำลังโหลดข้อมูล...</p>
+        </div>
+    </div>
+
+    <!-- ===== SIDEBAR NAVIGATION ===== -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-scroll"></i>
+                <div class="logo-text">
+                    <h1>ลานท่าวัง</h1>
+                    <span class="subtitle">ทะเบียนคัมภีร์ใบลาน</span>
+                </div>
+            </div>
+            <button id="sidebarClose" class="sidebar-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="nav-links">
+            <a href="#" class="nav-link active" data-page="dashboard">
+                <i class="fas fa-chart-pie"></i>
+                <span>แดชบอร์ด</span>
+            </a>
+            <a href="#" class="nav-link" data-page="register">
+                <i class="fas fa-plus-circle"></i>
+                <span>ลงทะเบียน</span>
+            </a>
+            <a href="#" class="nav-link" data-page="records">
+                <i class="fas fa-table"></i>
+                <span>รายการข้อมูล</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-circle sync-dot"></i>
+                <span>เชื่อมต่อแล้ว</span>
+            </div>
+            <p class="version-text">v1.0 © ลานท่าวัง 2026</p>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="mainContent" class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <button id="menuToggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="top-bar-title">
+                <h2 id="pageTitle">แดชบอร์ด</h2>
+            </div>
+            <div class="top-bar-actions">
+                <button id="refreshBtn" class="btn-icon" title="รีเฟรชข้อมูล">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="last-sync" id="lastSyncTime">
+                    อัพเดทล่าสุด: --:--
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <section id="dashboardPage" class="page active">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statTotal">0</span>
+                        <span class="stat-label">คัมภีร์ทั้งหมด</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-sheet1">
+                    <div class="stat-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statSheet1">0</span>
+                        <span class="stat-label">วัดวังตะวันตก</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-sheet2">
+                    <div class="stat-icon">
+                        <i class="fas fa-city"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statSheet2">0</span>
+                        <span class="stat-label">ฐานข้อมูลเมืองนคร</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-digitized">
+                    <div class="stat-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statDigitized">0</span>
+                        <span class="stat-label">Digitized แล้ว</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i class="fas fa-tags"></i> แบ่งตามหมวดคัมภีร์
+                    </h3>
+                    <div class="chart-body">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i class="fas fa-clock"></i> แบ่งตามยุคสมัย
+                    </h3>
+                    <div class="chart-body">
+                        <canvas id="eraChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Charts Row -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i class="fas fa-font"></i> แบ่งตามอักษร
+                    </h3>
+                    <div class="chart-body">
+                        <canvas id="scriptChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i class="fas fa-map-marker-alt"></i> แบ่งตามที่เก็บรักษา
+                    </h3>
+                    <div class="chart-body">
+                        <canvas id="locationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Records -->
+            <div class="table-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-list"></i> รายการล่าสุด (วัดวังตะวันตก)
+                </h3>
+                <div class="table-responsive">
+                    <table id="recentTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ที่</th>
+                                <th>เลขมัด</th>
+                                <th>รหัสคัมภีร์</th>
+                                <th>ชื่อเรื่อง</th>
+                                <th>หมวด</th>
+                                <th>ยุคสมัย</th>
+                                <th>อักษร</th>
+                                <th>ภาษา</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTableBody">
+                            <tr><td colspan="8" class="empty-message">ยังไม่มีข้อมูล</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== REGISTRATION FORM PAGE ===== -->
+        <section id="registerPage" class="page">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2><i class="fas fa-plus-circle"></i> ลงทะเบียนคัมภีร์ใบลาน</h2>
+                    <p class="form-desc">กรอกข้อมูลคัมภีร์ใบลานเพื่อเพิ่มรายการใหม่ในทะเบียน</p>
+                </div>
+
+                <form id="registrationForm" class="registration-form">
+                    <!-- Step Indicators -->
+                    <div class="form-steps">
+                        <div class="step active" data-step="1">
+                            <span class="step-number">1</span>
+                            <span class="step-label">ข้อมูลหลัก</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <span class="step-number">2</span>
+                            <span class="step-label">รายละเอียด</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <span class="step-number">3</span>
+                            <span class="step-label">ลักษณะกายภาพ</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <span class="step-number">4</span>
+                            <span class="step-label">การจัดเก็บ</span>
+                        </div>
+                        <div class="step" data-step="5">
+                            <span class="step-number">5</span>
+                            <span class="step-label">บันทึกเพิ่มเติม</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: ข้อมูลหลัก -->
+                    <div class="form-step-content active" data-step="1">
+                        <h3 class="section-title"><i class="fas fa-info-circle"></i> ข้อมูลหลัก</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="เลขมัดInput"><i class="fas fa-barcode"></i> เลขมัด <span class="required">*</span></label>
+                                <input type="number" id="เลขมัดInput" min="1" max="999" placeholder="กรอกตัวเลข เช่น 1, 3, 12" required>
+                                <span class="field-hint" id="เลขมัดPreview"></span>
+                                <input type="hidden" id="เลขมัด" name="เลขมัด">
+                            </div>
+                            <div class="form-group">
+                                <label for="เลขคัมภีร์Input"><i class="fas fa-hashtag"></i> เลขคัมภีร์ <span class="required">*</span></label>
+                                <input type="number" id="เลขคัมภีร์Input" min="1" max="99" placeholder="กรอกเลข 1-99" required>
+                                <span class="field-hint" id="เลขคัมภีร์Preview"></span>
+                                <input type="hidden" id="เลขคัมภีร์" name="เลขคัมภีร์">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="รหัสคัมภีร์"><i class="fas fa-key"></i> รหัสคัมภีร์ <span class="auto-badge">สร้างอัตโนมัติ</span></label>
+                                <input type="text" id="รหัสคัมภีร์" name="รหัสคัมภีร์" readonly class="auto-field" placeholder="NS-VTT-PL-XXX-XX (สร้างจากเลขมัด + เลขคัมภีร์)">
+                                <span class="field-hint">NS = นครศรีธรรมราช | VTT = วัดวังตะวันตก | PL = ใบลาน</span>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="ชื่อเรื่องบนคัมภีร์"><i class="fas fa-heading"></i> ชื่อคัมภีร์ <span class="required">*</span></label>
+                                <input type="text" id="ชื่อเรื่องบนคัมภีร์" name="ชื่อเรื่องบนคัมภีร์" placeholder="ชื่อคัมภีร์ที่ปรากฏ" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="หมวดคัมภีร์"><i class="fas fa-folder"></i> หมวดคัมภีร์</label>
+                                <select id="หมวดคัมภีร์" name="หมวดคัมภีร์">
+                                    <option value="">-- เลือกหมวด --</option>
+                                    <optgroup label="พระไตรปิฎก">
+                                        <option value="พระวินัยปิฏก">พระวินัยปิฏก</option>
+                                        <option value="พระสุตตันตปิฏก">พระสุตตันตปิฏก</option>
+                                        <option value="พระอภิธรรมปิฎก">พระอภิธรรมปิฎก</option>
+                                    </optgroup>
+                                    <optgroup label="อรรถกถา">
+                                        <option value="อรรถกถาพระวินัยปิฏก">อรรถกถาพระวินัยปิฏก</option>
+                                        <option value="อรรถกถาพระสุตตันตปิฏก">อรรถกถาพระสุตตันตปิฏก</option>
+                                        <option value="อรรถกถาพระอภิธรรมปิฎก">อรรถกถาพระอภิธรรมปิฎก</option>
+                                        <option value="อรรถกถาพิเศษ">อรรถกถาพิเศษ</option>
+                                    </optgroup>
+                                    <optgroup label="ฏีกา">
+                                        <option value="ฏีกาพระวินัยปิฏก">ฏีกาพระวินัยปิฏก</option>
+                                        <option value="ฏีกาพระสุตตันตปิฏก">ฏีกาพระสุตตันตปิฏก</option>
+                                        <option value="ฎีกาพระอภิธรรมปิฎก">ฎีกาพระอภิธรรมปิฎก</option>
+                                        <option value="อนุฏีกา">อนุฏีกา</option>
+                                        <option value="นวฏีกา">นวฏีกา</option>
+                                    </optgroup>
+                                    <optgroup label="โยชนา-คัณฐี">
+                                        <option value="โยชนาพระวินัย">โยชนาพระวินัย</option>
+                                        <option value="โยชนาพระอภิธรรม">โยชนาพระอภิธรรม</option>
+                                        <option value="คัณฐีพระวินัย">คัณฐีพระวินัย</option>
+                                        <option value="คัณฐีพระสูตร">คัณฐีพระสูตร</option>
+                                        <option value="คัณฐีพระอภิธรรม">คัณฐีพระอภิธรรม</option>
+                                    </optgroup>
+                                    <optgroup label="คัมภีร์อื่นๆ">
+                                        <option value="ปกรณ์วิเสส">ปกรณ์วิเสส</option>
+                                        <option value="สัททาวิเสส">สัททาวิเสส</option>
+                                        <option value="ปกิณกะ">ปกิณกะ</option>
+                                    </optgroup>
+                                    <optgroup label="ประวัติศาสตร์-วรรณกรรม">
+                                        <option value="พงศาวดาร">พงศาวดาร</option>
+                                        <option value="ตำนาน-ประวัติ">ตำนาน-ประวัติ</option>
+                                        <option value="โลกศาสตร์">โลกศาสตร์</option>
+                                        <option value="นิทาน">นิทาน</option>
+                                        <option value="ชาดก">ชาดก</option>
+                                        <option value="วรรณคดี">วรรณคดี</option>
+                                    </optgroup>
+                                    <optgroup label="พิธีกรรม-ศาสนา">
+                                        <option value="บทสวดมนต์">บทสวดมนต์</option>
+                                        <option value="กรรมฐาน">กรรมฐาน</option>
+                                        <option value="ประเพณี">ประเพณี</option>
+                                        <option value="พิธีกรรม">พิธีกรรม</option>
+                                        <option value="อานิสงส์">อานิสงส์</option>
+                                    </optgroup>
+                                    <optgroup label="ศาสตร์-ตำรา">
+                                        <option value="กฏหมาย">กฏหมาย</option>
+                                        <option value="ไสยศาสตร์">ไสยศาสตร์</option>
+                                        <option value="ตำรายา">ตำรายา</option>
+                                        <option value="โหราศาสตร์">โหราศาสตร์</option>
+                                    </optgroup>
+                                    <optgroup label="อื่นๆ">
+                                        <option value="บัญชีคัมภีร์">บัญชีคัมภีร์</option>
+                                        <option value="ยังจำแนกไม่ได้">ยังจำแนกไม่ได้</option>
+                                        <option value="__custom__">ระบุ...</option>
+                                    </optgroup>
+                                </select>
+                                <input type="text" id="หมวดคัมภีร์Custom" class="custom-input" placeholder="พิมพ์ชื่อหมวดใหม่" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: รายละเอียดคัมภีร์ -->
+                    <div class="form-step-content" data-step="2">
+                        <h3 class="section-title"><i class="fas fa-book-open"></i> รายละเอียดคัมภีร์</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="จำนวนผูก"><i class="fas fa-layer-group"></i> จำนวนผูก</label>
+                                <input type="number" id="จำนวนผูก" name="จำนวนผูก" placeholder="จำนวน" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="ผูกที่มี"><i class="fas fa-list-ol"></i> ผูกที่มี</label>
+                                <input type="text" id="ผูกที่มี" name="ผูกที่มี" placeholder="เช่น 1-7">
+                            </div>
+                            <div class="form-group">
+                                <label for="ยุคสมัย"><i class="fas fa-clock"></i> ยุคสมัย</label>
+                                <select id="ยุคสมัย" name="ยุคสมัย">
+                                    <option value="">-- เลือกยุคสมัย --</option>
+                                    <option value="รัตนโกสินทร์">รัตนโกสินทร์</option>
+                                    <option value="อยุธยา">อยุธยา</option>
+                                    <option value="ธนบุรี">ธนบุรี</option>
+                                    <option value="ยังไม่ระบุสมัย">ยังไม่ระบุสมัย</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="ยุคสมัยCustom" class="custom-input" placeholder="พิมพ์ยุคสมัยใหม่" style="display:none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="อักษร"><i class="fas fa-font"></i> อักษร</label>
+                                <select id="อักษร" name="อักษร">
+                                    <option value="">-- เลือกอักษร --</option>
+                                    <option value="ขอม">ขอม</option>
+                                    <option value="ไทย">ไทย</option>
+                                    <option value="ธรรม">ธรรม</option>
+                                    <option value="ไทยนิเทศ">ไทยนิเทศ</option>
+                                    <option value="ขอม-ไทย">ขอม-ไทย</option>
+                                    <option value="ขอมย่อ">ขอมย่อ</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="อักษรCustom" class="custom-input" placeholder="พิมพ์ชนิดอักษรใหม่" style="display:none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="ภาษา"><i class="fas fa-language"></i> ภาษา</label>
+                                <select id="ภาษา" name="ภาษา">
+                                    <option value="">-- เลือกภาษา --</option>
+                                    <option value="บาลี">บาลี</option>
+                                    <option value="บาลี-ไทย">บาลี-ไทย</option>
+                                    <option value="ไทย">ไทย</option>
+                                    <option value="ขอมย่อ">ขอมย่อ</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="ภาษาCustom" class="custom-input" placeholder="พิมพ์ภาษาใหม่" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: ลักษณะทางกายภาพ -->
+                    <div class="form-step-content" data-step="3">
+                        <h3 class="section-title"><i class="fas fa-ruler"></i> ลักษณะทางกายภาพ</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="เส้น"><i class="fas fa-pen-nib"></i> เส้น</label>
+                                <select id="เส้น" name="เส้น">
+                                    <option value="">-- เลือก --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ฉบับ"><i class="fas fa-file"></i> ฉบับ</label>
+                                <select id="ฉบับ" name="ฉบับ">
+                                    <option value="">-- เลือก --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ชนิดไม้ประกับ"><i class="fas fa-tree"></i> ชนิดไม้ประกับ</label>
+                                <select id="ชนิดไม้ประกับ" name="ชนิดไม้ประกับ">
+                                    <option value="">-- เลือก --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ฉลากคัมภีร์"><i class="fas fa-tag"></i> ฉลากคัมภีร์</label>
+                                <input type="text" id="ฉลากคัมภีร์" name="ฉลากคัมภีร์" placeholder="ข้อมูลฉลาก">
+                            </div>
+                            <div class="form-group">
+                                <label for="ผ้าห่อคัมภีร์"><i class="fas fa-box"></i> ผ้าห่อคัมภีร์</label>
+                                <input type="text" id="ผ้าห่อคัมภีร์" name="ผ้าห่อคัมภีร์" placeholder="ลักษณะผ้าห่อ">
+                            </div>
+                            <div class="form-group">
+                                <label for="ขนาดคัมภีร์"><i class="fas fa-ruler-combined"></i> ขนาดคัมภีร์ (ซม.)</label>
+                                <input type="text" id="ขนาดคัมภีร์" name="ขนาดคัมภีร์" placeholder="กว้าง x ยาว">
+                            </div>
+                            <div class="form-group">
+                                <label for="ขนาดไม้ประกับ"><i class="fas fa-ruler-horizontal"></i> ขนาดไม้ประกับ (ซม.)</label>
+                                <input type="text" id="ขนาดไม้ประกับ" name="ขนาดไม้ประกับ" placeholder="กว้าง x ยาว">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: การจัดเก็บ -->
+                    <div class="form-step-content" data-step="4">
+                        <h3 class="section-title"><i class="fas fa-archive"></i> การจัดเก็บ</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ตู้ที่"><i class="fas fa-cabinet-filing"></i> ตู้ที่</label>
+                                <input type="text" id="ตู้ที่" name="ตู้ที่" placeholder="เลขตู้">
+                            </div>
+                            <div class="form-group">
+                                <label for="ชั้นที่"><i class="fas fa-layer-group"></i> ชั้นที่</label>
+                                <input type="text" id="ชั้นที่" name="ชั้นที่" placeholder="เลขชั้น">
+                            </div>
+                            <div class="form-group">
+                                <label for="ปีที่สร้าง"><i class="fas fa-calendar-alt"></i> ปีที่สร้าง</label>
+                                <input type="text" id="ปีที่สร้าง" name="ปีที่สร้าง" placeholder="ปี พ.ศ.">
+                            </div>
+                            <div class="form-group">
+                                <label for="ชื่อผู้สร้าง"><i class="fas fa-user"></i> ชื่อผู้สร้าง</label>
+                                <input type="text" id="ชื่อผู้สร้าง" name="ชื่อผู้สร้าง" placeholder="ชื่อ-สกุล">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="ประวัติ/บริบท"><i class="fas fa-history"></i> ประวัติ/บริบท</label>
+                                <textarea id="ประวัติ/บริบท" name="ประวัติ/บริบท" rows="3" placeholder="ประวัติและบริบทของคัมภีร์"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: บันทึกเพิ่มเติม -->
+                    <div class="form-step-content" data-step="5">
+                        <h3 class="section-title"><i class="fas fa-clipboard-check"></i> บันทึกเพิ่มเติม</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="สภาพคัมภีร์"><i class="fas fa-thermometer-half"></i> สภาพคัมภีร์</label>
+                                <select id="สภาพคัมภีร์" name="สภาพคัมภีร์">
+                                    <option value="">-- เลือก --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Digitize"><i class="fas fa-camera"></i> Digitize</label>
+                                <select id="Digitize" name="Digitize">
+                                    <option value="">-- เลือก --</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="หมายเหตุสภาพ"><i class="fas fa-exclamation-triangle"></i> หมายเหตุสภาพ</label>
+                                <textarea id="หมายเหตุสภาพ" name="หมายเหตุสภาพ" rows="2" placeholder="รายละเอียดสภาพ"></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="หมายเหตุ"><i class="fas fa-sticky-note"></i> หมายเหตุ</label>
+                                <textarea id="หมายเหตุ" name="หมายเหตุ" rows="2" placeholder="หมายเหตุทั่วไป"></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="ประวัติการจัดการ"><i class="fas fa-cogs"></i> ประวัติการจัดการ</label>
+                                <textarea id="ประวัติการจัดการ" name="ประวัติการจัดการ" rows="2" placeholder="ประวัติการดูแลรักษา/ซ่อมแซม"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="ผู้บันทึก"><i class="fas fa-user-edit"></i> ผู้บันทึก <span class="required">*</span></label>
+                                <input type="text" id="ผู้บันทึก" name="ผู้บันทึก" placeholder="ชื่อผู้บันทึกข้อมูล" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Navigation Buttons -->
+                    <div class="form-navigation">
+                        <button type="button" id="prevStepBtn" class="btn btn-secondary" style="display:none;">
+                            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+                        </button>
+                        <button type="button" id="nextStepBtn" class="btn btn-primary">
+                            ถัดไป <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn btn-success" style="display:none;">
+                            <i class="fas fa-save"></i> บันทึกข้อมูล
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ===== RECORDS TABLE PAGE ===== -->
+        <section id="recordsPage" class="page">
+            <div class="records-header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="ค้นหา... (ชื่อเรื่อง, รหัส, เลขมัด)">
+                </div>
+                <div class="filter-controls">
+                    <select id="sourceFilter" class="filter-select">
+                        <option value="all">ทุกแหล่ง</option>
+                        <option value="sheet1">วัดวังตะวันตก</option>
+                        <option value="sheet2">ฐานข้อมูลเมืองนคร</option>
+                    </select>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="all">ทุกหมวด</option>
+                    </select>
+                    <select id="eraFilter" class="filter-select">
+                        <option value="all">ทุกยุคสมัย</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table id="recordsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="ที่">ที่ <i class="fas fa-sort"></i></th>
+                                <th>แหล่ง</th>
+                                <th class="sortable" data-sort="เลขมัด">เลขมัด <i class="fas fa-sort"></i></th>
+                                <th class="sortable" data-sort="รหัสคัมภีร์">รหัสคัมภีร์ <i class="fas fa-sort"></i></th>
+                                <th class="sortable" data-sort="ชื่อเรื่อง">ชื่อเรื่อง <i class="fas fa-sort"></i></th>
+                                <th>หมวด</th>
+                                <th>ยุคสมัย</th>
+                                <th>อักษร</th>
+                                <th>ภาษา</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <tr><td colspan="10" class="empty-message">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-pagination">
+                    <span id="recordCount" class="record-count">แสดง 0 รายการ</span>
+                    <div class="pagination-controls">
+                        <button id="prevPageBtn" class="btn-icon" disabled><i class="fas fa-chevron-left"></i></button>
+                        <span id="pageInfo" class="page-info">หน้า 1</span>
+                        <button id="nextPageBtn" class="btn-icon"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== DETAIL MODAL ===== -->
+        <div id="detailModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle"><i class="fas fa-scroll"></i> รายละเอียดคัมภีร์</h3>
+                    <button id="modalClose" class="btn-icon"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Filled dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button id="modalEditBtn" class="btn btn-primary"><i class="fas fa-edit"></i> แก้ไข</button>
+                    <button id="modalDeleteBtn" class="btn btn-danger"><i class="fas fa-trash"></i> ลบ</button>
+                    <button id="modalCloseBtn" class="btn btn-secondary">ปิด</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOAST NOTIFICATION ===== -->
+        <div id="toastContainer" class="toast-container"></div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
