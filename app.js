@@ -1174,11 +1174,11 @@ async function handleFormSubmit(e) {
             resetAutoFields();
             goToFormStep(1);
             
-            // Reload data
-            await loadAllData();
-            
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-save"></i> บันทึกข้อมูล';
+            
+            // Sync background (ไม่ block UI)
+            loadFullDataBackground();
         } catch (err) {
             showToast('error', 'เกิดข้อผิดพลาด: ' + err.message);
             document.getElementById('submitBtn').disabled = false;
@@ -1245,9 +1245,18 @@ async function deleteRecord(index) {
     
     if (API_URL && API_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
         try {
-            await apiPost('deleteRecord', { rowIndex: record._rowIndex });
+            // Optimistic: ลบจาก local state ทันที
+            state.sheet1Data = state.sheet1Data.filter(r => r._rowIndex !== record._rowIndex);
+            mergeAndDisplayRecords();
             showToast('success', 'ลบรายการเรียบร้อย');
-            await loadAllData();
+            
+            // ส่ง API ใน background (ไม่ block UI)
+            apiPost('deleteRecord', { rowIndex: record._rowIndex }).then(() => {
+                loadFullDataBackground(); // sync จริงทีหลัง
+            }).catch(err => {
+                showToast('error', 'เกิดข้อผิดพลาด: ' + err.message);
+                loadFullDataBackground(); // reload ถ้า error
+            });
         } catch (err) {
             showToast('error', 'เกิดข้อผิดพลาด: ' + err.message);
         }
