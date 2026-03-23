@@ -353,6 +353,11 @@ function setupEventListeners() {
         updateLastSyncTime();
     });
     
+    // Quick Add button
+    document.getElementById('quickAddBtn').addEventListener('click', () => {
+        navigateTo('register');
+    });
+    
     // Form step navigation
     document.getElementById('nextStepBtn').addEventListener('click', nextFormStep);
     document.getElementById('prevStepBtn').addEventListener('click', prevFormStep);
@@ -551,20 +556,85 @@ function renderDashboard() {
     const data = state.dashboardData;
     if (!data) return;
     
-    // Animate stat numbers
-    animateNumber('statTotal', data.summary.totalAll);
-    animateNumber('statSheet1', data.summary.totalSheet1);
-    animateNumber('statSheet2', data.summary.totalSheet2);
-    animateNumber('statDigitized', data.summary.digitized);
+    // Animate stat numbers (มัด/เรื่อง/ผูก/Digitized)
+    animateNumber('statBundles', data.summary.totalBundles || 0);
+    animateNumber('statStories', data.summary.totalAll || 0);
+    animateNumber('statVolumes', data.summary.totalVolumes || 0);
+    animateNumber('statDigitized', data.summary.digitized || 0);
+    
+    // Render progress bars (สถิติการทำสำเนา)
+    renderDigitizeProgress(data);
     
     // Render charts
     renderCategoryChart(data.categoryCount);
     renderEraChart(data.eraCount);
     renderScriptChart(data.scriptCount);
-    renderLocationChart(data.locationCount);
+    renderDigitizeDonut(data);
     
     // Recent records table
     renderRecentTable();
+}
+
+function renderDigitizeProgress(data) {
+    const s = data.summary;
+    
+    // มัด
+    const bundlesTotal = s.totalBundles || 1;
+    const bundlesDigi = s.digitizedBundles || 0;
+    const bundlesPercent = Math.round((bundlesDigi / bundlesTotal) * 100);
+    document.getElementById('digitizeBundles').textContent = `${bundlesDigi}/${bundlesTotal}`;
+    document.getElementById('digitizeBundlesBar').style.width = `${bundlesPercent}%`;
+    document.getElementById('digitizeBundlesPercent').textContent = `${bundlesPercent}%`;
+    
+    // เรื่อง
+    const storiesTotal = s.totalAll || 1;
+    const storiesDigi = s.digitizedStories || 0;
+    const storiesPercent = Math.round((storiesDigi / storiesTotal) * 100);
+    document.getElementById('digitizeStories').textContent = `${storiesDigi}/${storiesTotal}`;
+    document.getElementById('digitizeStoriesBar').style.width = `${storiesPercent}%`;
+    document.getElementById('digitizeStoriesPercent').textContent = `${storiesPercent}%`;
+    
+    // ผูก
+    const volumesTotal = s.totalVolumes || 1;
+    const volumesDigi = s.digitizedVolumes || 0;
+    const volumesPercent = Math.round((volumesDigi / volumesTotal) * 100);
+    document.getElementById('digitizeVolumes').textContent = `${volumesDigi}/${volumesTotal}`;
+    document.getElementById('digitizeVolumesBar').style.width = `${volumesPercent}%`;
+    document.getElementById('digitizeVolumesPercent').textContent = `${volumesPercent}%`;
+}
+
+function renderDigitizeDonut(data) {
+    const ctx = document.getElementById('digitizeChart');
+    if (!ctx) return;
+    
+    if (state.charts.digitize) state.charts.digitize.destroy();
+    
+    const digitized = data.summary.digitized || 0;
+    const notDigitized = (data.summary.totalAll || 0) - digitized;
+    
+    state.charts.digitize = new Chart(ctx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Digitized แล้ว', 'ยังไม่ได้'],
+            datasets: [{
+                data: [digitized, notDigitized],
+                backgroundColor: ['#C4A44B', '#E8DCC8'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Sarabun', size: 12 } }
+                }
+            }
+        }
+    });
 }
 
 function animateNumber(elementId, target) {

@@ -71,6 +71,9 @@
                 <h2 id="pageTitle">แดชบอร์ด</h2>
             </div>
             <div class="top-bar-actions">
+                <button id="quickAddBtn" class="btn-icon btn-add" title="สร้างรายการใหม่">
+                    <i class="fas fa-plus"></i>
+                </button>
                 <button id="refreshBtn" class="btn-icon" title="รีเฟรชข้อมูล">
                     <i class="fas fa-sync-alt"></i>
                 </button>
@@ -86,29 +89,29 @@
             <div class="stats-grid">
                 <div class="stat-card stat-total">
                     <div class="stat-icon">
-                        <i class="fas fa-scroll"></i>
+                        <i class="fas fa-layer-group"></i>
                     </div>
                     <div class="stat-info">
-                        <span class="stat-number" id="statTotal">0</span>
-                        <span class="stat-label">คัมภีร์ทั้งหมด</span>
+                        <span class="stat-number" id="statBundles">0</span>
+                        <span class="stat-label">จำนวนมัด</span>
                     </div>
                 </div>
                 <div class="stat-card stat-sheet1">
                     <div class="stat-icon">
-                        <i class="fas fa-landmark"></i>
+                        <i class="fas fa-scroll"></i>
                     </div>
                     <div class="stat-info">
-                        <span class="stat-number" id="statSheet1">0</span>
-                        <span class="stat-label">วัดวังตะวันตก</span>
+                        <span class="stat-number" id="statStories">0</span>
+                        <span class="stat-label">จำนวนเรื่อง</span>
                     </div>
                 </div>
                 <div class="stat-card stat-sheet2">
                     <div class="stat-icon">
-                        <i class="fas fa-city"></i>
+                        <i class="fas fa-book-open"></i>
                     </div>
                     <div class="stat-info">
-                        <span class="stat-number" id="statSheet2">0</span>
-                        <span class="stat-label">ฐานข้อมูลเมืองนคร</span>
+                        <span class="stat-number" id="statVolumes">0</span>
+                        <span class="stat-label">จำนวนผูก</span>
                     </div>
                 </div>
                 <div class="stat-card stat-digitized">
@@ -122,7 +125,46 @@
                 </div>
             </div>
 
-            <!-- Charts Row -->
+            <!-- สถิติการทำสำเนา -->
+            <div class="copy-stats-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-copy"></i> สถิติการทำสำเนา (Digitize)
+                </h3>
+                <div class="copy-stats-grid">
+                    <div class="copy-stat-item">
+                        <div class="copy-stat-header">
+                            <span class="copy-stat-label">เลขมัด</span>
+                            <span class="copy-stat-value" id="digitizeBundles">0/0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="digitizeBundlesBar" style="width: 0%"></div>
+                        </div>
+                        <span class="copy-stat-percent" id="digitizeBundlesPercent">0%</span>
+                    </div>
+                    <div class="copy-stat-item">
+                        <div class="copy-stat-header">
+                            <span class="copy-stat-label">จำนวนเรื่อง</span>
+                            <span class="copy-stat-value" id="digitizeStories">0/0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="digitizeStoriesBar" style="width: 0%"></div>
+                        </div>
+                        <span class="copy-stat-percent" id="digitizeStoriesPercent">0%</span>
+                    </div>
+                    <div class="copy-stat-item">
+                        <div class="copy-stat-header">
+                            <span class="copy-stat-label">จำนวนผูก</span>
+                            <span class="copy-stat-value" id="digitizeVolumes">0/0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="digitizeVolumesBar" style="width: 0%"></div>
+                        </div>
+                        <span class="copy-stat-percent" id="digitizeVolumesPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
             <div class="charts-grid">
                 <div class="chart-card">
                     <h3 class="chart-title">
@@ -142,7 +184,7 @@
                 </div>
             </div>
 
-            <!-- Second Charts Row -->
+            <!-- Charts Row 2 -->
             <div class="charts-grid">
                 <div class="chart-card">
                     <h3 class="chart-title">
@@ -154,10 +196,10 @@
                 </div>
                 <div class="chart-card">
                     <h3 class="chart-title">
-                        <i class="fas fa-map-marker-alt"></i> แบ่งตามที่เก็บรักษา
+                        <i class="fas fa-camera-retro"></i> สถิติการบันทึกภาพดิจิทัล
                     </h3>
                     <div class="chart-body">
-                        <canvas id="locationChart"></canvas>
+                        <canvas id="digitizeChart"></canvas>
                     </div>
                 </div>
             </div>

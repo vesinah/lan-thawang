@@ -194,8 +194,37 @@ function getDashboardData() {
   const totalSheet2 = sheet2Data.length;
   const totalAll = totalSheet1 + totalSheet2;
 
-  // นับจำนวนที่ digitize แล้ว (Sheet 1)
+  // จำนวนมัด (unique เลขมัด)
+  const bundleSet = new Set();
+  sheet1Data.forEach(r => { if (r['เลขมัด']) bundleSet.add(r['เลขมัด']); });
+  sheet2Data.forEach(r => { if (r['เลขมัด']) bundleSet.add(r['เลขมัด']); });
+  const totalBundles = bundleSet.size;
+
+  // จำนวนผูก (รวมจำนวนผูกทั้งหมด)
+  let totalVolumes = 0;
+  sheet1Data.forEach(r => {
+    const v = parseInt(r['จำนวนผูก']) || 0;
+    totalVolumes += v > 0 ? v : 1; // อย่างน้อยคัมภีร์ละ 1 ผูก
+  });
+  sheet2Data.forEach(r => {
+    const v = parseInt(r['จำนวนผูก']) || 0;
+    totalVolumes += v > 0 ? v : 1;
+  });
+
+  // นับจำนวนที่ digitize แล้ว
   const digitized = sheet1Data.filter(r => r['Digitize'] === 'แล้ว').length;
+  
+  // digitize stats สำหรับ progress bars
+  const digiSheet1 = sheet1Data.filter(r => r['Digitize'] === 'แล้ว');
+  const digiBundleSet = new Set();
+  digiSheet1.forEach(r => { if (r['เลขมัด']) digiBundleSet.add(r['เลขมัด']); });
+  const digitizedBundles = digiBundleSet.size;
+  const digitizedStories = digiSheet1.length;
+  let digitizedVolumes = 0;
+  digiSheet1.forEach(r => {
+    const v = parseInt(r['จำนวนผูก']) || 0;
+    digitizedVolumes += v > 0 ? v : 1;
+  });
 
   // สรุปตามหมวด
   const categoryCount = {};
@@ -235,7 +264,6 @@ function getDashboardData() {
     const loc = r['ที่เก็บรักษา'] || 'ไม่ระบุ';
     locationCount[loc] = (locationCount[loc] || 0) + 1;
   });
-  // เพิ่มวัดวังตะวันตกจาก Sheet 1
   if (totalSheet1 > 0) {
     locationCount['วัดวังตะวันตก'] = totalSheet1;
   }
@@ -252,7 +280,12 @@ function getDashboardData() {
       totalAll,
       totalSheet1,
       totalSheet2,
-      digitized
+      totalBundles,
+      totalVolumes,
+      digitized,
+      digitizedBundles,
+      digitizedStories,
+      digitizedVolumes
     },
     categoryCount,
     eraCount,
