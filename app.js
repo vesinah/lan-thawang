@@ -439,7 +439,13 @@ function setupAutoGenerateFields() {
         { selectId: 'หมวดคัมภีร์', customId: 'หมวดคัมภีร์Custom' },
         { selectId: 'ยุคสมัย', customId: 'ยุคสมัยCustom' },
         { selectId: 'อักษร', customId: 'อักษรCustom' },
-        { selectId: 'ภาษา', customId: 'ภาษาCustom' }
+        { selectId: 'ภาษา', customId: 'ภาษาCustom' },
+        { selectId: 'เส้น', customId: 'เส้นCustom' },
+        { selectId: 'ฉบับ', customId: 'ฉบับCustom' },
+        { selectId: 'ชนิดไม้ประกับ', customId: 'ชนิดไม้ประกับCustom' },
+        { selectId: 'ฉลากคัมภีร์', customId: 'ฉลากคัมภีร์Custom' },
+        { selectId: 'ผ้าห่อคัมภีร์', customId: 'ผ้าห่อคัมภีร์Custom' },
+        { selectId: 'สภาพ', customId: 'สภาพCustom' }
     ];
 
     customDropdowns.forEach(({ selectId, customId }) => {
@@ -519,7 +525,7 @@ function resetAutoFields() {
     const รหัส = document.getElementById('รหัสคัมภีร์');
     if (รหัส) รหัส.value = '';
     // Reset all custom dropdown inputs
-    const customInputIds = ['หมวดคัมภีร์Custom', 'ยุคสมัยCustom', 'อักษรCustom', 'ภาษาCustom'];
+    const customInputIds = ['หมวดคัมภีร์Custom', 'ยุคสมัยCustom', 'อักษรCustom', 'ภาษาCustom', 'เส้นCustom', 'ฉบับCustom', 'ชนิดไม้ประกับCustom', 'ฉลากคัมภีร์Custom', 'ผ้าห่อคัมภีร์Custom', 'สภาพCustom'];
     customInputIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -964,7 +970,7 @@ function closeModal() {
 
 function populateDropdowns(options) {
     // dropdown ที่ hardcode ไว้ใน HTML แล้ว ไม่ต้อง populate
-    const hardcodedDropdowns = ['หมวดคัมภีร์', 'ยุคสมัย', 'อักษร', 'ภาษา'];
+    const hardcodedDropdowns = ['หมวดคัมภีร์', 'ยุคสมัย', 'อักษร', 'ภาษา', 'เส้น', 'ฉบับ', 'ชนิดไม้ประกับ', 'ฉลากคัมภีร์', 'ผ้าห่อคัมภีร์', 'สภาพ'];
     Object.keys(options).forEach(fieldName => {
         if (hardcodedDropdowns.includes(fieldName)) return;
         
@@ -1051,7 +1057,13 @@ async function handleFormSubmit(e) {
         { name: 'หมวดคัมภีร์', customId: 'หมวดคัมภีร์Custom' },
         { name: 'ยุคสมัย', customId: 'ยุคสมัยCustom' },
         { name: 'อักษร', customId: 'อักษรCustom' },
-        { name: 'ภาษา', customId: 'ภาษาCustom' }
+        { name: 'ภาษา', customId: 'ภาษาCustom' },
+        { name: 'เส้น', customId: 'เส้นCustom' },
+        { name: 'ฉบับ', customId: 'ฉบับCustom' },
+        { name: 'ชนิดไม้ประกับ', customId: 'ชนิดไม้ประกับCustom' },
+        { name: 'ฉลากคัมภีร์', customId: 'ฉลากคัมภีร์Custom' },
+        { name: 'ผ้าห่อคัมภีร์', customId: 'ผ้าห่อคัมภีร์Custom' },
+        { name: 'สภาพ', customId: 'สภาพCustom' }
     ];
     customFields.forEach(({ name, customId }) => {
         if (record[name] === '__custom__') {

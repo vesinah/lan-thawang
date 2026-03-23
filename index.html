@@ -373,28 +373,85 @@
                             <div class="form-group">
                                 <label for="เส้น"><i class="fas fa-pen-nib"></i> เส้น</label>
                                 <select id="เส้น" name="เส้น">
-                                    <option value="">-- เลือก --</option>
+                                    <option value="">-- เลือกเส้น --</option>
+                                    <option value="จาร">จาร</option>
+                                    <option value="ชุบ">ชุบ</option>
+                                    <option value="หมึก">หมึก</option>
+                                    <option value="พิมพ์">พิมพ์</option>
+                                    <option value="__custom__">ระบุ...</option>
                                 </select>
+                                <input type="text" id="เส้นCustom" class="custom-input" placeholder="พิมพ์ชนิดเส้นใหม่" style="display:none;">
                             </div>
                             <div class="form-group">
                                 <label for="ฉบับ"><i class="fas fa-file"></i> ฉบับ</label>
                                 <select id="ฉบับ" name="ฉบับ">
-                                    <option value="">-- เลือก --</option>
+                                    <option value="">-- เลือกฉบับ --</option>
+                                    <option value="ล่องชาด">ล่องชาด</option>
+                                    <option value="รักทึบ">รักทึบ</option>
+                                    <option value="ทองทึบ">ทองทึบ</option>
+                                    <option value="ลานดิบ">ลานดิบ</option>
+                                    <option value="ข้างลาย">ข้างลาย</option>
+                                    <option value="รักล่องชาด">รักล่องชาด</option>
+                                    <option value="__custom__">ระบุ...</option>
                                 </select>
+                                <input type="text" id="ฉบับCustom" class="custom-input" placeholder="พิมพ์ชนิดฉบับใหม่" style="display:none;">
                             </div>
                             <div class="form-group">
                                 <label for="ชนิดไม้ประกับ"><i class="fas fa-tree"></i> ชนิดไม้ประกับ</label>
                                 <select id="ชนิดไม้ประกับ" name="ชนิดไม้ประกับ">
-                                    <option value="">-- เลือก --</option>
+                                    <option value="">-- เลือกชนิดไม้ประกับ --</option>
+                                    <option value="ธรรมดา">ธรรมดา</option>
+                                    <option value="รดน้ำ">รดน้ำ</option>
+                                    <option value="ไม่มี">ไม่มี</option>
+                                    <option value="จีน">จีน</option>
+                                    <option value="เขียนสี">เขียนสี</option>
+                                    <option value="สีแดงน้ำมัน">สีแดงน้ำมัน</option>
+                                    <option value="__custom__">ระบุ...</option>
                                 </select>
+                                <input type="text" id="ชนิดไม้ประกับCustom" class="custom-input" placeholder="พิมพ์ชนิดไม้ประกับใหม่" style="display:none;">
                             </div>
                             <div class="form-group">
                                 <label for="ฉลากคัมภีร์"><i class="fas fa-tag"></i> ฉลากคัมภีร์</label>
-                                <input type="text" id="ฉลากคัมภีร์" name="ฉลากคัมภีร์" placeholder="ข้อมูลฉลาก">
+                                <select id="ฉลากคัมภีร์" name="ฉลากคัมภีร์">
+                                    <option value="">-- เลือกฉลาก --</option>
+                                    <option value="ไม่มี">ไม่มี</option>
+                                    <option value="ใบลาน">ใบลาน</option>
+                                    <option value="ไม้">ไม้</option>
+                                    <option value="กระดาษ">กระดาษ</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="ฉลากคัมภีร์Custom" class="custom-input" placeholder="พิมพ์ชนิดฉลากใหม่" style="display:none;">
                             </div>
                             <div class="form-group">
                                 <label for="ผ้าห่อคัมภีร์"><i class="fas fa-box"></i> ผ้าห่อคัมภีร์</label>
-                                <input type="text" id="ผ้าห่อคัมภีร์" name="ผ้าห่อคัมภีร์" placeholder="ลักษณะผ้าห่อ">
+                                <select id="ผ้าห่อคัมภีร์" name="ผ้าห่อคัมภีร์">
+                                    <option value="">-- เลือกผ้าห่อ --</option>
+                                    <option value="ผ้าใหม่สีเหลือง">ผ้าใหม่สีเหลือง</option>
+                                    <option value="ผ้าใหม่สีม่วง">ผ้าใหม่สีม่วง</option>
+                                    <option value="ผ้าใหม่สีเหลืองขลิบม่วง">ผ้าใหม่สีเหลืองขลิบม่วง</option>
+                                    <option value="ผ้าใหม่สีม่วงขลิบเหลือง">ผ้าใหม่สีม่วงขลิบเหลือง</option>
+                                    <option value="ผ้าจีวร">ผ้าจีวร</option>
+                                    <option value="ไม่มีผ้า">ไม่มีผ้า</option>
+                                    <option value="ผ้าพิมพ์ลาย">ผ้าพิมพ์ลาย</option>
+                                    <option value="ตรวจสอบอีกครั้ง">ตรวจสอบอีกครั้ง</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="ผ้าห่อคัมภีร์Custom" class="custom-input" placeholder="พิมพ์ชนิดผ้าห่อใหม่" style="display:none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="สภาพ"><i class="fas fa-heartbeat"></i> สภาพ</label>
+                                <select id="สภาพ" name="สภาพ">
+                                    <option value="">-- เลือกสภาพ --</option>
+                                    <option value="สมบูรณ์">สมบูรณ์</option>
+                                    <option value="ชำรุดแต่ยังมีเนื้อความสมบูรณ์">ชำรุดแต่ยังมีเนื้อความสมบูรณ์</option>
+                                    <option value="ไม่มีปก">ไม่มีปก</option>
+                                    <option value="หน้าลานตอนต้นขาดหาย">หน้าลานตอนต้นขาดหาย</option>
+                                    <option value="หน้าลานตอนท้ายขาดหาย">หน้าลานตอนท้ายขาดหาย</option>
+                                    <option value="ชำรุดจับตัวเป็นก้อน">ชำรุดจับตัวเป็นก้อน</option>
+                                    <option value="แตกผูก">แตกผูก</option>
+                                    <option value="__custom__">ระบุ...</option>
+                                </select>
+                                <input type="text" id="สภาพCustom" class="custom-input" placeholder="พิมพ์สภาพใหม่" style="display:none;">
                             </div>
                             <div class="form-group">
                                 <label for="ขนาดคัมภีร์"><i class="fas fa-ruler-combined"></i> ขนาดคัมภีร์ (ซม.)</label>
@@ -464,7 +521,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="ผู้บันทึก"><i class="fas fa-user-edit"></i> ผู้บันทึก <span class="required">*</span></label>
-                                <input type="text" id="ผู้บันทึก" name="ผู้บันทึก" placeholder="ชื่อผู้บันทึกข้อมูล" required>
+                                <input type="text" id="ผู้บันทึก" name="ผู้บันทึก" placeholder="ชื่อผู้บันทึกข้อมูล" value="สุรเชษฐ์ แก้วสกุล" required>
                             </div>
                         </div>
                     </div>
