@@ -8,7 +8,7 @@
 
 // ===== CONFIG =====
 // ⚠️ เปลี่ยน URL นี้เป็น URL ของ Google Apps Script Web App ที่ deploy แล้ว
-const API_URL = 'https://script.google.com/macros/s/AKfycbzR2NxDhnDtY3kLH8IbNznk63L4XNPjQ-UBWvNg6sV5Fmhs58Da5UGbA0TT2TVWHwUt/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz-ovCtyNHHztPpGJltsBKQiLI4Pkjau4ZuJ5JYpBpkHqRiCNm4PpBDYe7DMfXzTrw/exec';
 
 // Polling interval (ms) สำหรับ real-time sync
 const SYNC_INTERVAL = 30000; // 30 วินาที
