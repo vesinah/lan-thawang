@@ -130,20 +130,29 @@ async function apiPost(action, payload) {
 
 async function loadAllData() {
     try {
+        // โหลด dashboard summary ก่อน (เร็ว เพราะ GAS คำนวณ server-side)
+        const dashboard = await apiGet('getDashboard');
+        state.dashboardData = dashboard;
+        renderDashboard();
+        updateLastSyncTime();
+        
+        // โหลด full data แบบ background (ไม่ block หน้าจอ)
+        loadFullDataBackground();
+    } catch (err) {
+        console.error('Error loading dashboard:', err);
+        showToast('error', 'ไม่สามารถโหลดข้อมูลได้: ' + err.message);
+    }
+}
+
+async function loadFullDataBackground() {
+    try {
         const result = await apiGet('getAllData');
         state.sheet1Data = result.sheet1 || [];
         state.sheet2Data = result.sheet2 || [];
-        
-        // Load dashboard
-        const dashboard = await apiGet('getDashboard');
-        state.dashboardData = dashboard;
-        
-        renderDashboard();
         mergeAndDisplayRecords();
-        updateLastSyncTime();
+        console.log('Full data loaded:', state.sheet1Data.length + state.sheet2Data.length, 'records');
     } catch (err) {
-        console.error('Error loading data:', err);
-        showToast('error', 'ไม่สามารถโหลดข้อมูลได้: ' + err.message);
+        console.error('Error loading full data:', err);
     }
 }
 
