@@ -129,19 +129,56 @@ async function apiPost(action, payload) {
 }
 
 async function loadAllData() {
+    // 1. แสดงข้อมูลจาก localStorage ทันที (ไม่ต้องรอ API)
+    const cachedDashboard = localStorage.getItem('lt_dashboard');
+    const cachedSheet1 = localStorage.getItem('lt_sheet1');
+    const cachedSheet2 = localStorage.getItem('lt_sheet2');
+    
+    if (cachedDashboard) {
+        try {
+            state.dashboardData = JSON.parse(cachedDashboard);
+            renderDashboard();
+            updateLastSyncTime();
+            console.log('Dashboard loaded from cache (instant)');
+        } catch(e) { /* ignore parse errors */ }
+    }
+    if (cachedSheet1 && cachedSheet2) {
+        try {
+            state.sheet1Data = JSON.parse(cachedSheet1);
+            state.sheet2Data = JSON.parse(cachedSheet2);
+            mergeAndDisplayRecords();
+            console.log('Records loaded from cache (instant)');
+        } catch(e) { /* ignore */ }
+    }
+    
+    // 2. ซ่อน loading overlay ทันที (ถ้ามี cache)
+    if (cachedDashboard) {
+        hideLoading();
+    }
+    
+    // 3. Sync จาก API ใน background
+    refreshFromAPI();
+}
+
+async function refreshFromAPI() {
     try {
-        // โหลด dashboard summary ก่อน (เร็ว เพราะ GAS คำนวณ server-side)
+        // โหลด dashboard
         const dashboard = await apiGet('getDashboard');
         state.dashboardData = dashboard;
+        localStorage.setItem('lt_dashboard', JSON.stringify(dashboard));
         renderDashboard();
         updateLastSyncTime();
-        
-        // โหลด full data แบบ background (ไม่ block หน้าจอ)
-        loadFullDataBackground();
+        hideLoading();
     } catch (err) {
         console.error('Error loading dashboard:', err);
-        showToast('error', 'ไม่สามารถโหลดข้อมูลได้: ' + err.message);
+        if (!state.dashboardData) {
+            showToast('error', 'ไม่สามารถโหลดข้อมูลได้: ' + err.message);
+        }
+        hideLoading();
     }
+    
+    // โหลด full data
+    loadFullDataBackground();
 }
 
 async function loadFullDataBackground() {
@@ -149,11 +186,18 @@ async function loadFullDataBackground() {
         const result = await apiGet('getAllData');
         state.sheet1Data = result.sheet1 || [];
         state.sheet2Data = result.sheet2 || [];
+        localStorage.setItem('lt_sheet1', JSON.stringify(state.sheet1Data));
+        localStorage.setItem('lt_sheet2', JSON.stringify(state.sheet2Data));
         mergeAndDisplayRecords();
-        console.log('Full data loaded:', state.sheet1Data.length + state.sheet2Data.length, 'records');
+        console.log('Full data synced:', state.sheet1Data.length + state.sheet2Data.length, 'records');
     } catch (err) {
         console.error('Error loading full data:', err);
     }
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
 }
 
 function loadDemoData() {
