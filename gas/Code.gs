@@ -93,7 +93,7 @@ function doGet(e) {
         });
 
       case 'getDashboard':
-        return createCorsOutput({ success: true, data: getDashboardData() });
+        return createCorsOutput({ success: true, data: getCachedDashboard() });
 
       case 'getDropdowns':
         return createCorsOutput({ success: true, data: DROPDOWN_OPTIONS });
@@ -155,6 +155,31 @@ function getSheetData(sheetId, sheetName, columns) {
     // กรองแถวที่ว่างทั้งหมดออก
     return columns.some(col => obj[col] && obj[col].toString().trim() !== '');
   });
+}
+
+/**
+ * ดึง dashboard จาก cache (เร็วมาก) หรือ compute ใหม่ถ้าหมดอายุ
+ */
+function getCachedDashboard() {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get('dashboardData');
+  
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  
+  const data = getDashboardData();
+  // cache 5 นาที (300 วินาที)
+  cache.put('dashboardData', JSON.stringify(data), 300);
+  return data;
+}
+
+/**
+ * ล้าง cache (เรียกเมื่อมีการเพิ่ม/แก้ไข/ลบข้อมูล)
+ */
+function invalidateCache() {
+  const cache = CacheService.getScriptCache();
+  cache.remove('dashboardData');
 }
 
 /**
@@ -257,6 +282,7 @@ function addRecord(record) {
   });
 
   sheet.appendRow(rowData);
+  invalidateCache();
   
   return { 
     message: 'เพิ่มรายการสำเร็จ', 
@@ -275,6 +301,7 @@ function updateRecord(rowIndex, record) {
   const rowData = SHEET1_COLUMNS.map(col => record[col] || '');
   
   sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+  invalidateCache();
   
   return { message: 'แก้ไขรายการสำเร็จ', rowIndex };
 }
@@ -287,6 +314,7 @@ function deleteRecord(rowIndex) {
   const sheet = ss.getSheetByName(SHEET1_NAME);
   
   sheet.deleteRow(rowIndex);
+  invalidateCache();
   
   return { message: 'ลบรายการสำเร็จ' };
 }
