@@ -8,7 +8,7 @@
 
 // ===== CONFIG =====
 // ⚠️ เปลี่ยน URL นี้เป็น URL ของ Google Apps Script Web App ที่ deploy แล้ว
-const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzR2NxDhnDtY3kLH8IbNznk63L4XNPjQ-UBWvNg6sV5Fmhs58Da5UGbA0TT2TVWHwUt/exec';
 
 // Polling interval (ms) สำหรับ real-time sync
 const SYNC_INTERVAL = 30000; // 30 วินาที
@@ -110,7 +110,8 @@ async function apiPost(action, payload) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action, ...payload })
         });
         const data = await response.json();
