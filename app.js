@@ -969,6 +969,9 @@ function renderRecordsTable() {
                         ${row._source === 'sheet1' ? `
                         <button class="btn-icon" onclick="event.stopPropagation(); editRecord(${start + i})" title="แก้ไข">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="event.stopPropagation(); deleteRecordConfirm(${start + i})" title="ลบ">
+                            <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
                     </div>
                 </td>
@@ -1256,6 +1259,10 @@ async function deleteRecord(index) {
         mergeAndDisplayRecords();
         showToast('success', 'ลบรายการเรียบร้อย (โหมดสาธิต)');
     }
+}
+
+function deleteRecordConfirm(index) {
+    deleteRecord(index);
 }
 
 // ===== UTILITIES =====
